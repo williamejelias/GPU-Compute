@@ -1,0 +1,241 @@
+Intel(R) Advisor can now assist with vectorization and show optimization
+  report messages with your source code.
+See "https://software.intel.com/en-us/intel-advisor-xe" for details.
+
+Intel(R) C Intel(R) 64 Compiler for applications running on Intel(R) 64, Version 19.0.0.117 Build 20180804
+
+Compiler options: -O3 -qopt-report=5 -qopt-report-phase=vec -march=native -D_GNU_SOURCE -c -o utils.o
+
+Begin optimization report for: zero_dense(int, int, double *)
+
+    Report from: Vector optimizations [vec]
+
+
+LOOP BEGIN at utils.c(50,5)
+   remark #15542: loop was not vectorized: inner loop was already vectorized
+
+   LOOP BEGIN at utils.c(51,9)
+      remark #15542: loop was not vectorized: inner loop was already vectorized
+
+      LOOP BEGIN at utils.c(51,9)
+         remark #15389: vectorization support: reference dense[j*m+i] has unaligned access   [ utils.c(52,13) ]
+         remark #15381: vectorization support: unaligned access used inside loop body
+         remark #15305: vectorization support: vector length 4
+         remark #15399: vectorization support: unroll factor set to 2
+         remark #15309: vectorization support: normalized vectorization overhead 0.300
+         remark #15300: LOOP WAS VECTORIZED
+         remark #15451: unmasked unaligned unit stride stores: 1 
+         remark #15475: --- begin vector cost summary ---
+         remark #15476: scalar cost: 4 
+         remark #15477: vector cost: 1.250 
+         remark #15478: estimated potential speedup: 1.650 
+         remark #15488: --- end vector cost summary ---
+      LOOP END
+
+      LOOP BEGIN at utils.c(51,9)
+      <Remainder loop for vectorization>
+      LOOP END
+   LOOP END
+LOOP END
+===========================================================================
+
+Begin optimization report for: convert_sparse_to_dense(const COO, double **)
+
+    Report from: Vector optimizations [vec]
+
+
+LOOP BEGIN at utils.c(50,5) inlined into utils.c(102,5)
+   remark #15542: loop was not vectorized: inner loop was already vectorized
+
+   LOOP BEGIN at utils.c(51,9) inlined into utils.c(102,5)
+      remark #15542: loop was not vectorized: inner loop was already vectorized
+
+      LOOP BEGIN at utils.c(51,9) inlined into utils.c(102,5)
+         remark #15389: vectorization support: reference dense has unaligned access   [ utils.c(52,13) ]
+         remark #15381: vectorization support: unaligned access used inside loop body
+         remark #15305: vectorization support: vector length 4
+         remark #15399: vectorization support: unroll factor set to 2
+         remark #15309: vectorization support: normalized vectorization overhead 0.300
+         remark #15300: LOOP WAS VECTORIZED
+         remark #15451: unmasked unaligned unit stride stores: 1 
+         remark #15475: --- begin vector cost summary ---
+         remark #15476: scalar cost: 4 
+         remark #15477: vector cost: 1.250 
+         remark #15478: estimated potential speedup: 1.650 
+         remark #15488: --- end vector cost summary ---
+      LOOP END
+
+      LOOP BEGIN at utils.c(51,9) inlined into utils.c(102,5)
+      <Remainder loop for vectorization>
+      LOOP END
+   LOOP END
+LOOP END
+
+LOOP BEGIN at utils.c(103,5)
+<Peeled loop for vectorization>
+LOOP END
+
+LOOP BEGIN at utils.c(103,5)
+   remark #15388: vectorization support: reference sparse->data[n] has aligned access   [ utils.c(106,39) ]
+   remark #15328: vectorization support: non-unit strided load was emulated for the variable <sparse->coords->j[n]>, stride is 2   [ utils.c(105,13) ]
+   remark #15328: vectorization support: non-unit strided load was emulated for the variable <sparse->coords->i[n]>, stride is 2   [ utils.c(104,13) ]
+   remark #15329: vectorization support: irregularly indexed store was emulated for the variable <dense>, part of index is read from memory   [ utils.c(106,11) ]
+   remark #15305: vectorization support: vector length 2
+   remark #15399: vectorization support: unroll factor set to 4
+   remark #15309: vectorization support: normalized vectorization overhead 0.138
+   remark #15300: LOOP WAS VECTORIZED
+   remark #15442: entire loop may be executed in remainder
+   remark #15448: unmasked aligned unit stride loads: 1 
+   remark #15452: unmasked strided loads: 2 
+   remark #15463: unmasked indexed (or scatter) stores: 1 
+   remark #15475: --- begin vector cost summary ---
+   remark #15476: scalar cost: 12 
+   remark #15477: vector cost: 10.000 
+   remark #15478: estimated potential speedup: 1.190 
+   remark #15488: --- end vector cost summary ---
+LOOP END
+
+LOOP BEGIN at utils.c(103,5)
+<Remainder loop for vectorization>
+LOOP END
+===========================================================================
+
+Begin optimization report for: convert_dense_to_sparse(const double *, int, int, COO *)
+
+    Report from: Vector optimizations [vec]
+
+
+LOOP BEGIN at utils.c(127,5)
+   remark #15542: loop was not vectorized: inner loop was already vectorized
+
+   LOOP BEGIN at utils.c(128,9)
+   <Peeled loop for vectorization>
+   LOOP END
+
+   LOOP BEGIN at utils.c(128,9)
+      remark #15305: vectorization support: vector length 16
+      remark #15309: vectorization support: normalized vectorization overhead 0.256
+      remark #15300: LOOP WAS VECTORIZED
+      remark #15442: entire loop may be executed in remainder
+      remark #15450: unmasked unaligned unit stride loads: 1 
+      remark #15475: --- begin vector cost summary ---
+      remark #15476: scalar cost: 17 
+      remark #15477: vector cost: 2.430 
+      remark #15478: estimated potential speedup: 5.560 
+      remark #15488: --- end vector cost summary ---
+   LOOP END
+
+   LOOP BEGIN at utils.c(128,9)
+   <Remainder loop for vectorization>
+   LOOP END
+LOOP END
+
+LOOP BEGIN at utils.c(139,5)
+   remark #15344: loop was not vectorized: vector dependence prevents vectorization
+   remark #15346: vector dependence: assumed OUTPUT dependence between sp->coords->i[NZ] (143:17) and sp (145:17)
+   remark #15346: vector dependence: assumed OUTPUT dependence between sp (145:17) and sp->coords->i[NZ] (143:17)
+
+   LOOP BEGIN at utils.c(140,9)
+      remark #15344: loop was not vectorized: vector dependence prevents vectorization
+      remark #15346: vector dependence: assumed OUTPUT dependence between sp->coords->i[NZ] (143:17) and sp (145:17)
+      remark #15346: vector dependence: assumed OUTPUT dependence between sp (145:17) and sp->coords->i[NZ] (143:17)
+   LOOP END
+
+   LOOP BEGIN at utils.c(140,9)
+   <Remainder>
+   LOOP END
+LOOP END
+===========================================================================
+
+Begin optimization report for: random_matrix(int, int, double, COO *)
+
+    Report from: Vector optimizations [vec]
+
+
+LOOP BEGIN at utils.c(166,5)
+   remark #15382: vectorization support: call to function drand48(void) cannot be vectorized   [ utils.c(168,17) ]
+   remark #15382: vectorization support: call to function drand48(void) cannot be vectorized   [ utils.c(169,30) ]
+   remark #15344: loop was not vectorized: vector dependence prevents vectorization
+   remark #15346: vector dependence: assumed OUTPUT dependence between call:drand48(void) (168:17) and call:drand48(void) (169:30)
+   remark #15346: vector dependence: assumed OUTPUT dependence between call:drand48(void) (169:30) and call:drand48(void) (168:17)
+
+   LOOP BEGIN at utils.c(167,9)
+      remark #15382: vectorization support: call to function drand48(void) cannot be vectorized   [ utils.c(168,17) ]
+      remark #15382: vectorization support: call to function drand48(void) cannot be vectorized   [ utils.c(169,30) ]
+      remark #15344: loop was not vectorized: vector dependence prevents vectorization
+      remark #15346: vector dependence: assumed OUTPUT dependence between call:drand48(void) (168:17) and call:drand48(void) (169:30)
+      remark #15346: vector dependence: assumed OUTPUT dependence between call:drand48(void) (169:30) and call:drand48(void) (168:17)
+   LOOP END
+LOOP END
+
+LOOP BEGIN at utils.c(127,5) inlined into utils.c(175,5)
+   remark #15542: loop was not vectorized: inner loop was already vectorized
+
+   LOOP BEGIN at utils.c(128,9) inlined into utils.c(175,5)
+   <Peeled loop for vectorization>
+   LOOP END
+
+   LOOP BEGIN at utils.c(128,9) inlined into utils.c(175,5)
+      remark #15305: vectorization support: vector length 16
+      remark #15309: vectorization support: normalized vectorization overhead 0.256
+      remark #15300: LOOP WAS VECTORIZED
+      remark #15442: entire loop may be executed in remainder
+      remark #15450: unmasked unaligned unit stride loads: 1 
+      remark #15475: --- begin vector cost summary ---
+      remark #15476: scalar cost: 17 
+      remark #15477: vector cost: 2.430 
+      remark #15478: estimated potential speedup: 5.560 
+      remark #15488: --- end vector cost summary ---
+   LOOP END
+
+   LOOP BEGIN at utils.c(128,9) inlined into utils.c(175,5)
+   <Remainder loop for vectorization>
+   LOOP END
+LOOP END
+
+LOOP BEGIN at utils.c(139,5) inlined into utils.c(175,5)
+   remark #15344: loop was not vectorized: vector dependence prevents vectorization
+   remark #15346: vector dependence: assumed OUTPUT dependence between sp->coords->i[NZ] (143:17) and sp (145:17)
+   remark #15346: vector dependence: assumed OUTPUT dependence between sp (145:17) and sp->coords->i[NZ] (143:17)
+
+   LOOP BEGIN at utils.c(140,9) inlined into utils.c(175,5)
+      remark #15344: loop was not vectorized: vector dependence prevents vectorization
+      remark #15346: vector dependence: assumed OUTPUT dependence between sp->coords->i[NZ] (143:17) and sp (145:17)
+      remark #15346: vector dependence: assumed OUTPUT dependence between sp (145:17) and sp->coords->i[NZ] (143:17)
+   LOOP END
+
+   LOOP BEGIN at utils.c(140,9) inlined into utils.c(175,5)
+   <Remainder>
+   LOOP END
+LOOP END
+===========================================================================
+
+Begin optimization report for: read_sparse(const char *, COO *)
+
+    Report from: Vector optimizations [vec]
+
+
+LOOP BEGIN at utils.c(209,5)
+   remark #15523: loop was not vectorized: loop control variable k was found, but loop iteration count cannot be computed before executing the loop
+LOOP END
+===========================================================================
+
+Begin optimization report for: write_sparse(FILE *, COO)
+
+    Report from: Vector optimizations [vec]
+
+
+LOOP BEGIN at utils.c(249,5)
+   remark #15523: loop was not vectorized: loop control variable i was found, but loop iteration count cannot be computed before executing the loop
+LOOP END
+===========================================================================
+
+Begin optimization report for: print_sparse(COO)
+
+    Report from: Vector optimizations [vec]
+
+
+LOOP BEGIN at utils.c(249,5) inlined into utils.c(261,5)
+   remark #15523: loop was not vectorized: loop control variable i was found, but loop iteration count cannot be computed before executing the loop
+LOOP END
+===========================================================================

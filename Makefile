@@ -1,6 +1,6 @@
-CFLAGS = -O3 -march=native  -D_GNU_SOURCE
+CFLAGS = -O3 -qopt-report=5 -qopt-report-phase=vec -march=native  -D_GNU_SOURCE
 LDFLAGS = -lm
-CC = gcc
+CC = icc
 
 OBJ = optimised-sparsemm.o basic-sparsemm.o utils.o
 HEADER = utils.h

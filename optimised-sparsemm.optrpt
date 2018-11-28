@@ -1,0 +1,237 @@
+Intel(R) Advisor can now assist with vectorization and show optimization
+  report messages with your source code.
+See "https://software.intel.com/en-us/intel-advisor-xe" for details.
+
+Intel(R) C Intel(R) 64 Compiler for applications running on Intel(R) 64, Version 19.0.0.117 Build 20180804
+
+Compiler options: -O3 -qopt-report=5 -qopt-report-phase=vec -march=native -D_GNU_SOURCE -c -o optimised-sparsemm.o
+
+Begin optimization report for: sortColumnOrder(COO)
+
+    Report from: Vector optimizations [vec]
+
+
+LOOP BEGIN at optimised-sparsemm.c(14,5)
+   remark #15344: loop was not vectorized: vector dependence prevents vectorization
+   remark #15346: vector dependence: assumed ANTI dependence between matrix->coords->i[j] (18:29) and matrix->coords->i[j+1] (28:17)
+   remark #15346: vector dependence: assumed FLOW dependence between matrix->coords->i[j+1] (28:17) and matrix->coords->i[j] (18:29)
+
+   LOOP BEGIN at optimised-sparsemm.c(15,9)
+      remark #15344: loop was not vectorized: vector dependence prevents vectorization
+      remark #15346: vector dependence: assumed ANTI dependence between *(dtemp+j*8) (20:32) and *(dtemp+(j+1)*8) (30:17)
+      remark #15346: vector dependence: assumed FLOW dependence between *(dtemp+(j+1)*8) (30:17) and *(dtemp+j*8) (20:32)
+   LOOP END
+LOOP END
+===========================================================================
+
+Begin optimization report for: optimised_sparsemm(const COO, const COO, COO *)
+
+    Report from: Vector optimizations [vec]
+
+
+LOOP BEGIN at optimised-sparsemm.c(14,5) inlined into optimised-sparsemm.c(44,5)
+   remark #15344: loop was not vectorized: vector dependence prevents vectorization
+   remark #15346: vector dependence: assumed ANTI dependence between B->coords->i[j] (18:29) and B->coords->i[j+1] (28:17)
+   remark #15346: vector dependence: assumed FLOW dependence between B->coords->i[j+1] (28:17) and B->coords->i[j] (18:29)
+
+   LOOP BEGIN at optimised-sparsemm.c(15,9) inlined into optimised-sparsemm.c(44,5)
+      remark #15344: loop was not vectorized: vector dependence prevents vectorization
+      remark #15346: vector dependence: assumed ANTI dependence between *(dtemp+j*8) (20:32) and *(dtemp+(j+1)*8) (30:17)
+      remark #15346: vector dependence: assumed FLOW dependence between *(dtemp+(j+1)*8) (30:17) and *(dtemp+j*8) (20:32)
+   LOOP END
+LOOP END
+
+LOOP BEGIN at optimised-sparsemm.c(61,5)
+   remark #15542: loop was not vectorized: inner loop was already vectorized
+
+   LOOP BEGIN at optimised-sparsemm.c(80,13)
+      remark #15542: loop was not vectorized: inner loop was already vectorized
+
+      LOOP BEGIN at optimised-sparsemm.c(90,21)
+         remark #15542: loop was not vectorized: inner loop was already vectorized
+
+         LOOP BEGIN at optimised-sparsemm.c(102,25)
+         <Peeled loop for vectorization>
+         LOOP END
+
+         LOOP BEGIN at optimised-sparsemm.c(102,25)
+            remark #15389: vectorization support: reference B->data[inColumnIndexB] has unaligned access   [ optimised-sparsemm.c(103,37) ]
+            remark #15381: vectorization support: unaligned access used inside loop body
+            remark #15415: vectorization support: non-unit strided load was generated for the variable <B->coords->i[inColumnIndexB]>, stride is 2   [ optimised-sparsemm.c(104,39) ]
+            remark #15305: vectorization support: vector length 8
+            remark #15309: vectorization support: normalized vectorization overhead 0.720
+            remark #15300: LOOP WAS VECTORIZED
+            remark #15442: entire loop may be executed in remainder
+            remark #15450: unmasked unaligned unit stride loads: 1 
+            remark #15452: unmasked strided loads: 1 
+            remark #15475: --- begin vector cost summary ---
+            remark #15476: scalar cost: 17 
+            remark #15477: vector cost: 6.250 
+            remark #15478: estimated potential speedup: 2.610 
+            remark #15488: --- end vector cost summary ---
+         LOOP END
+
+         LOOP BEGIN at optimised-sparsemm.c(102,25)
+         <Remainder loop for vectorization>
+         LOOP END
+      LOOP END
+   LOOP END
+LOOP END
+===========================================================================
+
+Begin optimization report for: addThreeMatrices(COO, COO, COO, COO)
+
+    Report from: Vector optimizations [vec]
+
+
+LOOP BEGIN at optimised-sparsemm.c(183,24)
+   remark #15522: loop was not vectorized: loop control flow is too complex. Try using canonical loop form from OpenMP specification
+LOOP END
+===========================================================================
+
+Begin optimization report for: optimised_sparsemm_sum(const COO, const COO, const COO, const COO, const COO, const COO, COO *)
+
+    Report from: Vector optimizations [vec]
+
+
+LOOP BEGIN at optimised-sparsemm.c(14,5) inlined into optimised-sparsemm.c(365,5)
+   remark #15344: loop was not vectorized: vector dependence prevents vectorization
+   remark #15346: vector dependence: assumed ANTI dependence between H->coords->i[j] (18:29) and H->coords->i[j+1] (28:17)
+   remark #15346: vector dependence: assumed FLOW dependence between H->coords->i[j+1] (28:17) and H->coords->i[j] (18:29)
+
+   LOOP BEGIN at optimised-sparsemm.c(15,9) inlined into optimised-sparsemm.c(365,5)
+      remark #15344: loop was not vectorized: vector dependence prevents vectorization
+      remark #15346: vector dependence: assumed ANTI dependence between *(dtemp+j*8) (20:32) and *(dtemp+(j+1)*8) (30:17)
+      remark #15346: vector dependence: assumed FLOW dependence between *(dtemp+(j+1)*8) (30:17) and *(dtemp+j*8) (20:32)
+   LOOP END
+LOOP END
+
+LOOP BEGIN at optimised-sparsemm.c(61,5) inlined into optimised-sparsemm.c(365,5)
+   remark #15542: loop was not vectorized: inner loop was already vectorized
+
+   LOOP BEGIN at optimised-sparsemm.c(80,13) inlined into optimised-sparsemm.c(365,5)
+      remark #15542: loop was not vectorized: inner loop was already vectorized
+
+      LOOP BEGIN at optimised-sparsemm.c(90,21) inlined into optimised-sparsemm.c(365,5)
+         remark #15542: loop was not vectorized: inner loop was already vectorized
+
+         LOOP BEGIN at optimised-sparsemm.c(102,25) inlined into optimised-sparsemm.c(365,5)
+         <Peeled loop for vectorization>
+         LOOP END
+
+         LOOP BEGIN at optimised-sparsemm.c(102,25) inlined into optimised-sparsemm.c(365,5)
+            remark #15389: vectorization support: reference B->data[inColumnIndexB] has unaligned access   [ optimised-sparsemm.c(103,37) ]
+            remark #15381: vectorization support: unaligned access used inside loop body
+            remark #15415: vectorization support: non-unit strided load was generated for the variable <currentColumn->i[inColumnIndexB]>, stride is 2   [ optimised-sparsemm.c(104,39) ]
+            remark #15305: vectorization support: vector length 8
+            remark #15309: vectorization support: normalized vectorization overhead 0.720
+            remark #15300: LOOP WAS VECTORIZED
+            remark #15442: entire loop may be executed in remainder
+            remark #15450: unmasked unaligned unit stride loads: 1 
+            remark #15452: unmasked strided loads: 1 
+            remark #15475: --- begin vector cost summary ---
+            remark #15476: scalar cost: 17 
+            remark #15477: vector cost: 6.250 
+            remark #15478: estimated potential speedup: 2.610 
+            remark #15488: --- end vector cost summary ---
+         LOOP END
+
+         LOOP BEGIN at optimised-sparsemm.c(102,25) inlined into optimised-sparsemm.c(365,5)
+         <Remainder loop for vectorization>
+         LOOP END
+      LOOP END
+   LOOP END
+LOOP END
+===========================================================================
+
+Begin optimization report for: add_three_matrices2(COO, COO, COO, COO)
+
+    Report from: Vector optimizations [vec]
+
+
+LOOP BEGIN at optimised-sparsemm.c(266,5)
+   remark #15520: loop was not vectorized: loop with multiple exits cannot be vectorized unless it meets search loop idiom criteria   [ optimised-sparsemm.c(270,13) ]
+LOOP END
+
+LOOP BEGIN at optimised-sparsemm.c(324,5)
+<Distributed chunk1>
+   remark #15389: vectorization support: reference out->data[index] has unaligned access   [ optimised-sparsemm.c(327,9) ]
+   remark #15389: vectorization support: reference additions[index] has unaligned access   [ optimised-sparsemm.c(327,40) ]
+   remark #15389: vectorization support: reference additions[index] has unaligned access   [ optimised-sparsemm.c(327,40) ]
+   remark #15389: vectorization support: reference additions[index] has unaligned access   [ optimised-sparsemm.c(327,40) ]
+   remark #15381: vectorization support: unaligned access used inside loop body
+   remark #15335: loop was not vectorized: vectorization possible but seems inefficient. Use vector always directive or -vec-threshold0 to override 
+   remark #15328: vectorization support: indirect load was emulated for the variable <additions[index][0]>, 64-bit indexed, part of address is read from memory   [ optimised-sparsemm.c(216,23) ]
+   remark #15328: vectorization support: indirect load was emulated for the variable <additions[index][1]>, 64-bit indexed, part of address is read from memory   [ optimised-sparsemm.c(216,32) ]
+   remark #15328: vectorization support: indirect load was emulated for the variable <additions[index][2]>, 64-bit indexed, part of address is read from memory   [ optimised-sparsemm.c(216,41) ]
+   remark #15305: vectorization support: vector length 2
+   remark #15399: vectorization support: unroll factor set to 4
+   remark #15309: vectorization support: normalized vectorization overhead 0.048
+   remark #15450: unmasked unaligned unit stride loads: 1 
+   remark #15451: unmasked unaligned unit stride stores: 1 
+   remark #15462: unmasked indexed (or gather) loads: 3 
+   remark #15475: --- begin vector cost summary ---
+   remark #15476: scalar cost: 11 
+   remark #15477: vector cost: 15.500 
+   remark #15478: estimated potential speedup: 0.710 
+   remark #15488: --- end vector cost summary ---
+LOOP END
+
+LOOP BEGIN at optimised-sparsemm.c(324,5)
+<Peeled loop for vectorization, Distributed chunk2>
+LOOP END
+
+LOOP BEGIN at optimised-sparsemm.c(324,5)
+<Distributed chunk2>
+   remark #15389: vectorization support: reference out->coords->i[index] has unaligned access   [ optimised-sparsemm.c(325,9) ]
+   remark #15389: vectorization support: reference outIs[index] has unaligned access   [ optimised-sparsemm.c(325,34) ]
+   remark #15389: vectorization support: reference outJs[index] has unaligned access   [ optimised-sparsemm.c(326,34) ]
+   remark #15381: vectorization support: unaligned access used inside loop body
+   remark #15329: vectorization support: non-unit strided store was emulated for the variable <out->coords->i[index]>, stride is 2   [ optimised-sparsemm.c(325,9) ]
+   remark #15329: vectorization support: non-unit strided store was emulated for the variable <out->coords->j[index]>, stride is 2   [ optimised-sparsemm.c(326,9) ]
+   remark #15305: vectorization support: vector length 16
+   remark #15309: vectorization support: normalized vectorization overhead 0.421
+   remark #15301: PARTIAL LOOP WAS VECTORIZED
+   remark #15442: entire loop may be executed in remainder
+   remark #15450: unmasked unaligned unit stride loads: 2 
+   remark #15453: unmasked strided stores: 2 
+   remark #15475: --- begin vector cost summary ---
+   remark #15476: scalar cost: 13 
+   remark #15477: vector cost: 2.370 
+   remark #15478: estimated potential speedup: 4.550 
+   remark #15487: type converts: 2 
+   remark #15488: --- end vector cost summary ---
+LOOP END
+
+LOOP BEGIN at optimised-sparsemm.c(324,5)
+<Remainder loop for vectorization, Distributed chunk2>
+   remark #15389: vectorization support: reference out->coords->i[index] has unaligned access   [ optimised-sparsemm.c(325,9) ]
+   remark #15389: vectorization support: reference outIs[index] has unaligned access   [ optimised-sparsemm.c(325,34) ]
+   remark #15389: vectorization support: reference outJs[index] has unaligned access   [ optimised-sparsemm.c(326,34) ]
+   remark #15381: vectorization support: unaligned access used inside loop body
+   remark #15305: vectorization support: vector length 4
+   remark #15309: vectorization support: normalized vectorization overhead 1.188
+   remark #15301: REMAINDER LOOP WAS VECTORIZED
+   remark #15442: entire loop may be executed in remainder
+   remark #15450: unmasked unaligned unit stride loads: 2 
+   remark #15453: unmasked strided stores: 2 
+   remark #15475: --- begin vector cost summary ---
+   remark #15476: scalar cost: 13 
+   remark #15477: vector cost: 2.370 
+   remark #15478: estimated potential speedup: 4.550 
+   remark #15487: type converts: 2 
+   remark #15488: --- end vector cost summary ---
+LOOP END
+
+LOOP BEGIN at optimised-sparsemm.c(324,5)
+<Remainder loop for vectorization, Distributed chunk2>
+LOOP END
+
+
+Non-optimizable loops:
+
+
+LOOP BEGIN at optimised-sparsemm.c(315,9)
+   remark #15522: loop was not vectorized: loop control flow is too complex. Try using canonical loop form from OpenMP specification
+LOOP END
+===========================================================================

@@ -1,0 +1,35 @@
+Intel(R) Advisor can now assist with vectorization and show optimization
+  report messages with your source code.
+See "https://software.intel.com/en-us/intel-advisor-xe" for details.
+
+Intel(R) C Intel(R) 64 Compiler for applications running on Intel(R) 64, Version 19.0.0.117 Build 20180804
+
+Compiler options: -O3 -qopt-report=5 -qopt-report-phase=vec -march=native -D_GNU_SOURCE -o sparsemm -lm
+
+Begin optimization report for: main(int, char **)
+
+    Report from: Vector optimizations [vec]
+
+
+LOOP BEGIN at sparsemm.c(36,5) inlined into sparsemm.c(131,17)
+   remark #15382: vectorization support: call to function fprintf(FILE *, const char *, ...) cannot be vectorized   [ sparsemm.c(40,17) ]
+   remark #15344: loop was not vectorized: vector dependence prevents vectorization
+   remark #15346: vector dependence: assumed OUTPUT dependence between call:fprintf(FILE *, const char *, ...) (40:17) and call:fprintf(FILE *, const char *, ...) (40:17)
+   remark #15346: vector dependence: assumed OUTPUT dependence between call:fprintf(FILE *, const char *, ...) (40:17) and call:fprintf(FILE *, const char *, ...) (40:17)
+
+   LOOP BEGIN at sparsemm.c(37,9) inlined into sparsemm.c(131,17)
+      remark #15527: loop was not vectorized: function call to fprintf(FILE *, const char *, ...) cannot be vectorized   [ sparsemm.c(40,17) ]
+   LOOP END
+LOOP END
+
+LOOP BEGIN at sparsemm.c(78,5) inlined into sparsemm.c(132,17)
+   remark #15382: vectorization support: call to function fprintf(FILE *, const char *, ...) cannot be vectorized   [ sparsemm.c(82,17) ]
+   remark #15344: loop was not vectorized: vector dependence prevents vectorization
+   remark #15346: vector dependence: assumed OUTPUT dependence between call:fprintf(FILE *, const char *, ...) (82:17) and call:fprintf(FILE *, const char *, ...) (82:17)
+   remark #15346: vector dependence: assumed OUTPUT dependence between call:fprintf(FILE *, const char *, ...) (82:17) and call:fprintf(FILE *, const char *, ...) (82:17)
+
+   LOOP BEGIN at sparsemm.c(79,9) inlined into sparsemm.c(132,17)
+      remark #15527: loop was not vectorized: function call to fprintf(FILE *, const char *, ...) cannot be vectorized   [ sparsemm.c(82,17) ]
+   LOOP END
+LOOP END
+===========================================================================
