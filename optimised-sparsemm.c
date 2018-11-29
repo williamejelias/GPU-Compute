@@ -356,9 +356,9 @@ void optimised_sparsemm_sum(const COO A, const COO B, const COO C,
     // addThreeMatrices(A, B, C, G);
     // addThreeMatrices(D, E, F, H);
     add_three_matrices2(A, B, C, G);
-    printf("%f\n", G -> n);
+    // printf("%f\n", G -> n);
     add_three_matrices2(D, E, F, H);
-    printf("%f\n", H -> NZ);
+    // printf("%f\n", H -> NZ);
 
 
     // call optimised_sparsemm on G & H to output O
