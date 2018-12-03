@@ -38,6 +38,7 @@ void sortColumnOrder(COO matrix)
  */
 void optimised_sparsemm(const COO A, const COO B, COO *C)
 {
+    printf("multiplying\n");
 
     // return basic_sparsemm(A, B, C);
 
@@ -45,6 +46,28 @@ void optimised_sparsemm(const COO A, const COO B, COO *C)
 
     int outputNNZ = 0;
     alloc_sparse(A -> m, B -> n, A -> m * B -> n, C);
+
+
+
+    // convert A to CSR form
+    // NZs
+    // double *ANZ = NULL;
+    // ANZ = malloc(A -> NZ *sizeof(*ANZ));
+    //
+    // // AIs
+    // double *AIs = NULL;
+    // AIs = malloc((A -> m + 1)*sizeof(*AIs));
+    //
+    // // AJs
+    // double *AJs = NULL;
+    // AJs = malloc(A -> NZ *sizeof(*AJs));
+    //
+    // if(ANZ == NULL || AIs == NULL || AJs == NULL){
+    //     fprintf(stderr, "Out of memory...\n");
+    //     exit(1);
+    // }
+
+
     // printf("%i, %i", A->m, B->n);
 
     // record current row within A
@@ -140,7 +163,13 @@ void optimised_sparsemm(const COO A, const COO B, COO *C)
     // allocate correct NNZ value
     // printf("\n%i\n", outputNNZ);
     (*C)-> NZ = outputNNZ;
+    printf("multiplied\n");
     // printf("Output Matrix has dimensions %d x %d, and has %d Non-Zero Entries.\n", A -> m, B -> n, outputNNZ);
+
+
+    // free(ANZ);
+    // free(AIs);
+    // free(AJs);
 }
 
 
@@ -218,7 +247,8 @@ double sum_array(double* arr) {
 }
 
 
-void add_three_matrices2(COO m1, COO m2, COO m3, COO out) {
+void add_three_matrices2(COO m1, COO m2, COO m3, COO* out) {
+    printf("Adding\n");
     int m1index = 0;
     int m2index = 0;
     int m3index = 0;
@@ -266,7 +296,7 @@ void add_three_matrices2(COO m1, COO m2, COO m3, COO out) {
     }
 
     double** additions = malloc(maxNZ * sizeof(double*));
-    if(additions == NULL){
+    if(outIs == NULL || outJs == NULL || additions == NULL){
         fprintf(stderr, "Out of memory");
         exit(1);
     }
@@ -322,22 +352,25 @@ void add_three_matrices2(COO m1, COO m2, COO m3, COO out) {
         outNZ ++;
     }
 
-    // alloc_sparse(m1 -> m, m1 -> n, outNZ, &out);
-    // printf("%f", out->NZ);
+    alloc_sparse(m1 -> m, m1 -> n, outNZ, out);
 
     int index;
     // CHECK THIS PRAGMA FOR EFFICIENCY
     // #pragma vector always
     for (index = 0; index < outNZ; index ++) {
-        out -> coords[index].i = outIs[index];
-        out -> coords[index].j = outJs[index];
-        out -> data[index] = sum_array(additions[index]);
+        (*out) -> coords[index].i = outIs[index];
+        (*out) -> coords[index].j = outJs[index];
+        (*out) -> data[index] = sum_array(additions[index]);
     }
 
     free(additions);
     free(outIs);
     free(outJs);
+    printf("Added\n");
 }
+
+
+// ./sparsemm result.matrix ../small-matrices/DG2-ip-laplace-2D.matrix ../small-matrices/DG2-ip-laplace-2D.matrix  ../small-matrices/DG2-ip-laplace-2D.matrix  ../small-matrices/DG2-mass-2D.matrix  ../small-matrices/DG2-mass-2D.matrix  ../small-matrices/DG2-mass-2D.matrix
 
 
 /* Computes O = (A + B + C) (D + E + F).
@@ -354,19 +387,10 @@ void optimised_sparsemm_sum(const COO A, const COO B, const COO C,
     COO G;
     COO H;
 
-    alloc_sparse(A -> m, A -> n, A->m*A->n, &G);
-    alloc_sparse(D -> m, D -> n, D->m*D->n, &H);
-
-    // printf("G: m-%d, n-%d, NNZ-%d\n", G->m, G->n, G->NZ);
-    // printf("H: m-%d, n-%d, NNZ-%d\n", H->m, H->n, H->NZ);
-
     // addThreeMatrices(A, B, C, G);
     // addThreeMatrices(D, E, F, H);
-    add_three_matrices2(A, B, C, G);
-    // printf("%f\n", G -> n);
-    add_three_matrices2(D, E, F, H);
-    // printf("%f\n", H -> NZ);
-
+    add_three_matrices2(A, B, C, &G);
+    add_three_matrices2(D, E, F, &H);
 
     // call optimised_sparsemm on G & H to output O
     optimised_sparsemm(G, H, O);
