@@ -1,10 +1,10 @@
-CFLAGS = -O3 -qopt-report=5 -qopt-report-phase=vec -march=native  -D_GNU_SOURCE
+CFLAGS = -g -O3 -qopt-report=5 -qopt-report-phase=vec -march=native  -D_GNU_SOURCE
 LDFLAGS = -lm
 CC = icc
 
 OBJ = optimised-sparsemm.o basic-sparsemm.o utils.o
 HEADER = utils.h
-
+ 
 .PHONY: clean help check
 
 all: sparsemm
