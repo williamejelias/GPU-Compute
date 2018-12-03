@@ -281,14 +281,14 @@ void add_three_matrices2(COO m1, COO m2, COO m3, COO* out) {
     maxNZ += m2 -> NZ;
     maxNZ += m3 -> NZ;
 
-    double *outIs = NULL;
+    int *outIs = NULL;
     outIs = malloc(maxNZ*sizeof(*outIs));
     if(outIs == NULL){
         fprintf(stderr, "Out of memory");
         exit(1);
     }
 
-    double *outJs = NULL;
+    int *outJs = NULL;
     outJs = malloc(maxNZ*sizeof(*outJs));
     if(outJs == NULL){
         fprintf(stderr, "Out of memory");
