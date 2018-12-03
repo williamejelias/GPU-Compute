@@ -4,7 +4,7 @@ See "https://software.intel.com/en-us/intel-advisor-xe" for details.
 
 Intel(R) C Intel(R) 64 Compiler for applications running on Intel(R) 64, Version 19.0.0.117 Build 20180804
 
-Compiler options: -O3 -qopt-report=5 -qopt-report-phase=vec -march=native -D_GNU_SOURCE -c -o optimised-sparsemm.o
+Compiler options: -g -O3 -qopt-report=5 -qopt-report-phase=vec -march=native -D_GNU_SOURCE -c -o optimised-sparsemm.o
 
 Begin optimization report for: sortColumnOrder(COO)
 
@@ -94,32 +94,32 @@ Begin optimization report for: optimised_sparsemm_sum(const COO, const COO, cons
     Report from: Vector optimizations [vec]
 
 
-LOOP BEGIN at optimised-sparsemm.c(14,5) inlined into optimised-sparsemm.c(415,5)
+LOOP BEGIN at optimised-sparsemm.c(14,5) inlined into optimised-sparsemm.c(419,5)
    remark #15344: loop was not vectorized: vector dependence prevents vectorization
    remark #15346: vector dependence: assumed ANTI dependence between H->coords->i[j] (18:29) and H->coords->i[j+1] (28:17)
    remark #15346: vector dependence: assumed FLOW dependence between H->coords->i[j+1] (28:17) and H->coords->i[j] (18:29)
 
-   LOOP BEGIN at optimised-sparsemm.c(15,9) inlined into optimised-sparsemm.c(415,5)
+   LOOP BEGIN at optimised-sparsemm.c(15,9) inlined into optimised-sparsemm.c(419,5)
       remark #15344: loop was not vectorized: vector dependence prevents vectorization
       remark #15346: vector dependence: assumed ANTI dependence between *(dtemp+j*8) (20:32) and *(dtemp+(j+1)*8) (30:17)
       remark #15346: vector dependence: assumed FLOW dependence between *(dtemp+(j+1)*8) (30:17) and *(dtemp+j*8) (20:32)
    LOOP END
 LOOP END
 
-LOOP BEGIN at optimised-sparsemm.c(84,5) inlined into optimised-sparsemm.c(415,5)
+LOOP BEGIN at optimised-sparsemm.c(84,5) inlined into optimised-sparsemm.c(419,5)
    remark #15542: loop was not vectorized: inner loop was already vectorized
 
-   LOOP BEGIN at optimised-sparsemm.c(103,13) inlined into optimised-sparsemm.c(415,5)
+   LOOP BEGIN at optimised-sparsemm.c(103,13) inlined into optimised-sparsemm.c(419,5)
       remark #15542: loop was not vectorized: inner loop was already vectorized
 
-      LOOP BEGIN at optimised-sparsemm.c(113,21) inlined into optimised-sparsemm.c(415,5)
+      LOOP BEGIN at optimised-sparsemm.c(113,21) inlined into optimised-sparsemm.c(419,5)
          remark #15542: loop was not vectorized: inner loop was already vectorized
 
-         LOOP BEGIN at optimised-sparsemm.c(125,25) inlined into optimised-sparsemm.c(415,5)
+         LOOP BEGIN at optimised-sparsemm.c(125,25) inlined into optimised-sparsemm.c(419,5)
          <Peeled loop for vectorization>
          LOOP END
 
-         LOOP BEGIN at optimised-sparsemm.c(125,25) inlined into optimised-sparsemm.c(415,5)
+         LOOP BEGIN at optimised-sparsemm.c(125,25) inlined into optimised-sparsemm.c(419,5)
             remark #15389: vectorization support: reference B->data[inColumnIndexB] has unaligned access   [ optimised-sparsemm.c(126,37) ]
             remark #15381: vectorization support: unaligned access used inside loop body
             remark #15415: vectorization support: non-unit strided load was generated for the variable <currentColumn->i[inColumnIndexB]>, stride is 2   [ optimised-sparsemm.c(127,39) ]
@@ -136,7 +136,7 @@ LOOP BEGIN at optimised-sparsemm.c(84,5) inlined into optimised-sparsemm.c(415,5
             remark #15488: --- end vector cost summary ---
          LOOP END
 
-         LOOP BEGIN at optimised-sparsemm.c(125,25) inlined into optimised-sparsemm.c(415,5)
+         LOOP BEGIN at optimised-sparsemm.c(125,25) inlined into optimised-sparsemm.c(419,5)
          <Remainder loop for vectorization>
          LOOP END
       LOOP END
@@ -153,21 +153,21 @@ LOOP BEGIN at optimised-sparsemm.c(304,5)
    remark #15520: loop was not vectorized: loop with multiple exits cannot be vectorized unless it meets search loop idiom criteria   [ optimised-sparsemm.c(308,13) ]
 LOOP END
 
-LOOP BEGIN at optimised-sparsemm.c(376,5)
+LOOP BEGIN at optimised-sparsemm.c(377,5)
 <Peeled loop for vectorization>
 LOOP END
 
-LOOP BEGIN at optimised-sparsemm.c(376,5)
-   remark #15389: vectorization support: reference *out->coords->i[index] has unaligned access   [ optimised-sparsemm.c(377,11) ]
-   remark #15389: vectorization support: reference outIs[index] has unaligned access   [ optimised-sparsemm.c(377,37) ]
-   remark #15389: vectorization support: reference outJs[index] has unaligned access   [ optimised-sparsemm.c(378,37) ]
-   remark #15389: vectorization support: reference *out->data[index] has unaligned access   [ optimised-sparsemm.c(379,11) ]
-   remark #15389: vectorization support: reference additions[index] has unaligned access   [ optimised-sparsemm.c(379,43) ]
-   remark #15389: vectorization support: reference additions[index] has unaligned access   [ optimised-sparsemm.c(379,43) ]
-   remark #15389: vectorization support: reference additions[index] has unaligned access   [ optimised-sparsemm.c(379,43) ]
+LOOP BEGIN at optimised-sparsemm.c(377,5)
+   remark #15389: vectorization support: reference *out->coords->i[index] has unaligned access   [ optimised-sparsemm.c(378,11) ]
+   remark #15389: vectorization support: reference outIs[index] has unaligned access   [ optimised-sparsemm.c(378,37) ]
+   remark #15389: vectorization support: reference outJs[index] has unaligned access   [ optimised-sparsemm.c(379,37) ]
+   remark #15389: vectorization support: reference *out->data[index] has unaligned access   [ optimised-sparsemm.c(380,11) ]
+   remark #15389: vectorization support: reference additions[index] has unaligned access   [ optimised-sparsemm.c(380,43) ]
+   remark #15389: vectorization support: reference additions[index] has unaligned access   [ optimised-sparsemm.c(380,43) ]
+   remark #15389: vectorization support: reference additions[index] has unaligned access   [ optimised-sparsemm.c(380,43) ]
    remark #15381: vectorization support: unaligned access used inside loop body
-   remark #15329: vectorization support: non-unit strided store was emulated for the variable <*out->coords->i[index]>, stride is 2   [ optimised-sparsemm.c(377,11) ]
-   remark #15329: vectorization support: non-unit strided store was emulated for the variable <*out->coords->j[index]>, stride is 2   [ optimised-sparsemm.c(378,11) ]
+   remark #15329: vectorization support: non-unit strided store was emulated for the variable <*out->coords->i[index]>, stride is 2   [ optimised-sparsemm.c(378,11) ]
+   remark #15329: vectorization support: non-unit strided store was emulated for the variable <*out->coords->j[index]>, stride is 2   [ optimised-sparsemm.c(379,11) ]
    remark #15328: vectorization support: indirect load was emulated for the variable <additions[index][0]>, 64-bit indexed, part of address is read from memory   [ optimised-sparsemm.c(245,23) ]
    remark #15328: vectorization support: indirect load was emulated for the variable <additions[index][1]>, 64-bit indexed, part of address is read from memory   [ optimised-sparsemm.c(245,32) ]
    remark #15328: vectorization support: indirect load was emulated for the variable <additions[index][2]>, 64-bit indexed, part of address is read from memory   [ optimised-sparsemm.c(245,41) ]
@@ -187,12 +187,12 @@ LOOP BEGIN at optimised-sparsemm.c(376,5)
    remark #15488: --- end vector cost summary ---
 LOOP END
 
-LOOP BEGIN at optimised-sparsemm.c(376,5)
+LOOP BEGIN at optimised-sparsemm.c(377,5)
 <Remainder loop for vectorization>
 LOOP END
 
-LOOP BEGIN at optimised-sparsemm.c(382,5)
-   remark #15527: loop was not vectorized: function call to free(const void *) cannot be vectorized   [ optimised-sparsemm.c(383,9) ]
+LOOP BEGIN at optimised-sparsemm.c(385,5)
+   remark #15527: loop was not vectorized: function call to free(const void *) cannot be vectorized   [ optimised-sparsemm.c(387,9) ]
 LOOP END
 
 
