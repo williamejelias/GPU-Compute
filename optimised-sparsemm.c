@@ -336,9 +336,9 @@ void add_three_matrices2(COO m1, COO m2, COO m3, COO* out) {
         minI = m1 -> m;
         minJ = m1 -> n;
 
-        printf("\nM1 %d, %d\n", m1index, m1 -> NZ);
-        printf("M2 %d, %d\n", m2index, m2 -> NZ);
-        printf("M3 %d, %d\n", m3index, m3 -> NZ);
+        // printf("\nM1 %d, %d\n", m1index, m1 -> NZ);
+        // printf("M2 %d, %d\n", m2index, m2 -> NZ);
+        // printf("M3 %d, %d\n", m3index, m3 -> NZ);
 
         if (m1index < m1 -> NZ) if (m1I < minI) minI = m1I;
         if (m2index < m2 -> NZ) if (m2I < minI) minI = m2I;
