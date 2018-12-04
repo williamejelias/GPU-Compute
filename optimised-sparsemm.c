@@ -41,7 +41,6 @@ void optimised_sparsemm(const COO A, const COO B, COO *C)
     printf("multiplying\n");
 
     // return basic_sparsemm(A, B, C);
-
     sortColumnOrder(B);
 
     int outputNNZ = 0;
@@ -60,6 +59,25 @@ void optimised_sparsemm(const COO A, const COO B, COO *C)
     //
     // // AJs
     // double *AJs = NULL;
+    // AJs = malloc(A -> NZ *sizeof(*AJs));
+    //
+    // if(ANZ == NULL || AIs == NULL || AJs == NULL){
+    //     fprintf(stderr, "Out of memory...\n");
+    //     exit(1);
+    // }
+
+
+    // convert B to CSC form
+    // NZs
+    // double *BNZ = NULL;
+    // BNZ = malloc(B -> NZ *sizeof(*BNZ));
+    //
+    // // BIs
+    // double *BIs = NULL;
+    // BIs = malloc((B -> m + 1)*sizeof(*BIs));
+    //
+    // // AJs
+    // double *BJs = NULL;
     // AJs = malloc(A -> NZ *sizeof(*AJs));
     //
     // if(ANZ == NULL || AIs == NULL || AJs == NULL){
@@ -164,6 +182,7 @@ void optimised_sparsemm(const COO A, const COO B, COO *C)
     // printf("\n%i\n", outputNNZ);
     (*C)-> NZ = outputNNZ;
     printf("multiplied\n");
+    printf("output matrix has dimensions %i x %i\n", (*C)->m, (*C)->n);
     // printf("Output Matrix has dimensions %d x %d, and has %d Non-Zero Entries.\n", A -> m, B -> n, outputNNZ);
 
 
@@ -266,8 +285,7 @@ void add_three_matrices2(COO m1, COO m2, COO m3, COO* out) {
 
     // Passover to find indices of rows and columns to add
 
-    // object that has 3 arrays
-    // all arrays are of size outNZ
+    // object that has 3 arrays are of size outNZ
     // array of output i's
     // array of output j's
     // array vals which contains 3array of vals
@@ -314,16 +332,16 @@ void add_three_matrices2(COO m1, COO m2, COO m3, COO* out) {
         m3I = minI;
         m3J = minJ;
 
-        printf("\n");
+        // printf("\n");
 
+        // if in range of NZ
         if (m1index < m1 -> NZ){
           m1I = m1 -> coords[m1index].i;
           m1J = m1 -> coords[m1index].j;
-          // if in range of NZ
-          printf("M1 %i/%i - (%i, %i)\n", m1index, m1 -> NZ-1, m1I, m1J);
+          // printf("M1 %i/%i - (%i, %i)\n", m1index, m1 -> NZ-1, m1I, m1J);
           // printf("current minI: %i, m1i:%i\n", minI, m1 -> coords[m1index].i);
+          // if smaller than current seen
           if (m1I <= minI) {
-            // if smaller than current seen
             // set min to this i value
             minI = m1I;
             // printf("smaller, so new min I is %i\n", minI);
@@ -333,7 +351,7 @@ void add_three_matrices2(COO m1, COO m2, COO m3, COO* out) {
         if (m2index < m2 -> NZ) {
           m2I = m2 -> coords[m2index].i;
           m2J = m2 -> coords[m2index].j;
-          printf("M2 %i/%i - (%i, %i)\n", m2index, m2 -> NZ-1, m2I, m2J);
+          // printf("M2 %i/%i - (%i, %i)\n", m2index, m2 -> NZ-1, m2I, m2J);
           // printf("current minI: %i, m2i:%i\n", minI, m2 -> coords[m2index].i);
           if (m2I <= minI) {
             minI = m2I;
@@ -344,7 +362,7 @@ void add_three_matrices2(COO m1, COO m2, COO m3, COO* out) {
         if (m3index < m3 -> NZ) {
           m3I = m3 -> coords[m3index].i;
           m3J = m3 -> coords[m3index].j;
-          printf("M3 %i/%i - (%i, %i)\n", m3index, m3 -> NZ-1, m3I, m3J);
+          // printf("M3 %i/%i - (%i, %i)\n", m3index, m3 -> NZ-1, m3I, m3J);
           // printf("current minI: %i, m3i:%i\n", minI, m3 -> coords[m3index].i);
           if (m3I <= minI) {
             minI = m3I;
@@ -352,23 +370,9 @@ void add_three_matrices2(COO m1, COO m2, COO m3, COO* out) {
           }
         }
 
-
-
-        if (m1index < m1 -> NZ) {
-          if ((m1I == minI) && (m1J <= minJ)) {
-            minJ = m1J;
-          }
-        }
-        if (m2index < m2 -> NZ) {
-          if ((m2I == minI) && (m2J <= minJ)) {
-            minJ = m2J;
-          }
-        }
-        if (m3index < m3 -> NZ) {
-          if ((m3I == minI) && (m3J <= minJ)) {
-            minJ = m3J;
-          }
-        }
+        if ((m1I == minI) && (m1J <= minJ)) minJ = m1J;
+        if ((m2I == minI) && (m2J <= minJ)) minJ = m2J;
+        if ((m3I == minI) && (m3J <= minJ)) minJ = m3J;
 
         outIs[outNZ] = minI;
         outJs[outNZ] = minJ;
@@ -376,7 +380,7 @@ void add_three_matrices2(COO m1, COO m2, COO m3, COO* out) {
         // printf("Minimum: %i, %i\n", minI, minJ);
         if (m1index < m1 -> NZ) {
           if (m1I == minI && m1J == minJ) {
-            printf("Adding M1\n");
+            // printf("Adding M1\n");
             additions[outNZ][0] = m1->data[m1index];
             m1index ++;
           }
@@ -384,7 +388,7 @@ void add_three_matrices2(COO m1, COO m2, COO m3, COO* out) {
 
         if (m2index < m2 -> NZ) {
           if (m2I == minI && m2J == minJ) {
-            printf("Adding M2\n");
+            // printf("Adding M2\n");
             additions[outNZ][1] = m2->data[m2index];
             m2index ++;
           }
@@ -392,14 +396,18 @@ void add_three_matrices2(COO m1, COO m2, COO m3, COO* out) {
 
         if (m3index < m3 -> NZ) {
           if (m3I == minI && m3J == minJ) {
-            printf("Adding M3\n");
+            // printf("Adding M3\n");
             additions[outNZ][2] = m3->data[m3index];
             m3index ++;
           }
         }
+
+        printf("(%i, %i), gets sum of %f + %f + %f\n", minI, minJ, additions[outNZ][0], additions[outNZ][1], additions[outNZ][2]);
         outNZ ++;
     }
     printf("\nAllocating sparse\n");
+
+    printf("output matrix has dimensions %i x %i\n", m1->m, m1->n);
 
     alloc_sparse(m1 -> m, m1 -> n, outNZ, out);
 
