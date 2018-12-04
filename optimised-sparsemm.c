@@ -332,6 +332,10 @@ void add_three_matrices2(COO m1, COO m2, COO m3, COO* out) {
         m3I = minI;
         m3J = minJ;
 
+        additions[outNZ][0] = 0.0;
+        additions[outNZ][1] = 0.0;
+        additions[outNZ][2] = 0.0;
+
         // printf("\n");
 
         // if in range of NZ
@@ -402,7 +406,7 @@ void add_three_matrices2(COO m1, COO m2, COO m3, COO* out) {
           }
         }
 
-        printf("(%i, %i), gets sum of %f + %f + %f\n", minI, minJ, additions[outNZ][0], additions[outNZ][1], additions[outNZ][2]);
+        // printf("(%i, %i), gets sum of %f + %f + %f\n", minI, minJ, additions[outNZ][0], additions[outNZ][1], additions[outNZ][2]);
         outNZ ++;
     }
     printf("\nAllocating sparse\n");
