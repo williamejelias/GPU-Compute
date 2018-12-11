@@ -1,7 +1,7 @@
 #!/bin/csh
-#SBATCH --job-name="test"
-#SBATCH -o myscript.%A.out
-#SBATCH -e myscript.%A.err
+#SBATCH --job-name="vec_DG4_ip_large"
+#SBATCH -o vec_largeDG4_ip.%A.out
+#SBATCH -e vec_largeDG4_ip.%A.err
 #SBATCH -p par7.q
 #SBATCH --cpus-per-task=24
 #SBATCH --nodes=1
@@ -16,7 +16,31 @@ module load intel/xe_2018.2
 source /ddn/apps/Cluster-Apps/intel/xe_2018.2/vtune_amplifier/amplxe-vars.sh
 source /ddn/apps/Cluster-Apps/intel/xe_2018.2/advisor/advixe-vars.sh
 module load likwid/4.1
-
+module load pgi/17.9
+export LIKWID_PATH=/ddn/apps/Cluster-Apps/likwid/4.1
 
 # advixe-cl -collect roofline -- ./binary ./sparsemm result.matrix ../large-matrices/DG3-ip-laplace-2D.matrix ../large-matrices/DG3-mass-2D.matrix
-amplxe-cl ./sparsemm result.matrix ../large-matrices/DG3-ip-laplace-2D.matrix ../large-matrices/DG3-mass-2D.matrix
+
+# small DG1 mass squared 1749 5247
+# likwid-perfctr -C 14 -f -g DATA ./sparsemm result.matrix ./small-matrices/DG1-mass-2D.matrix ./small-matrices/DG1-mass-2D.matrix
+
+# small DG2 ip 2D squared 3498 80964
+# likwid-perfctr -C 14 -f -g DATA ./sparsemm result.matrix ./small-matrices/DG2-ip-laplace-2D.matrix ./small-matrices/DG2-ip-laplace-2D.matrix
+
+# small DG3 mass 2D squared 5830 58300
+# likwid-perfctr -C 14 -f -g DATA ./sparsemm result.matrix ./small-matrices/DG3-mass-2D.matrix ./small-matrices/DG3-mass-2D.matrix
+
+# small DG4 ip 2D squared 8745 506025
+# likwid-perfctr -C 14 -f -g DATA ./sparsemm result.matrix ./small-matrices/DG4-ip-laplace-2D.matrix ./small-matrices/DG4-ip-laplace-2D.matrix
+
+# large DG2 mass 3D squared 8950 89500
+# likwid-perfctr -C 14 -f -g DATA ./sparsemm result.matrix ./large-matrices/DG2-mass-3D.matrix ./large-matrices/DG2-mass-3D.matrix
+
+# large DG2 ip 3D squared 8950 385700
+# likwid-perfctr -C 14 -f -g DATA ./sparsemm result.matrix ./large-matrices/DG2-ip-laplace-3D.matrix ./large-matrices/DG2-ip-laplace-3D.matrix
+
+# large DG3 mass 3D squared 17900 358000
+# likwid-perfctr -C 14 -f -g DATA ./sparsemm result.matrix ./large-matrices/DG3-mass-3D.matrix ./large-matrices/DG3-mass-3D.matrix
+
+# large DG4 ip 3D squared 31325 4724825
+likwid-perfctr -C 14 -f -g DATA ./sparsemm result.matrix ./large-matrices/DG4-ip-laplace-3D.matrix ./large-matrices/DG4-ip-laplace-3D.matrix

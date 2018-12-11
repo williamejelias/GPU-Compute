@@ -4,7 +4,7 @@ See "https://software.intel.com/en-us/intel-advisor-xe" for details.
 
 Intel(R) C Intel(R) 64 Compiler for applications running on Intel(R) 64, Version 19.0.0.117 Build 20180804
 
-Compiler options: -O3 -qopt-report=5 -qopt-report-phase=vec -march=native -D_GNU_SOURCE -c -o basic-sparsemm.o
+Compiler options: -g -O3 -qopt-report=5 -qopt-report-phase=vec -march=native -D_GNU_SOURCE -c -o basic-sparsemm.o
 
 Begin optimization report for: basic_sparsemm(const COO, const COO, COO *)
 

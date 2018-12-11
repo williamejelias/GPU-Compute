@@ -38,56 +38,438 @@ void sortColumnOrder(COO matrix)
  */
 void optimised_sparsemm(const COO A, const COO B, COO *C)
 {
-    printf("multiplying\n");
+    // printf("multiplying\n");
 
     // return basic_sparsemm(A, B, C);
     sortColumnOrder(B);
 
     int outputNNZ = 0;
-    alloc_sparse(A -> m, B -> n, A -> m * B -> n, C);
+    int outputNonZeroes = getNonZeroes(A, B, *C);
+    alloc_sparse(A -> m, B -> n, outputNonZeroes, C);
+
+    // printf("A NNZ: %i, m:%i, n:%i\n", A->NZ, A->m, A->n);
+    // printf("B NNZ: %i, m:%i, n:%i\n", B->NZ, B->m, B->n);
+    // printf("C NNZ: %i, m:%i, n:%i\n", outputNonZeroes, A->m, B->n);
+
+    //--------------------------------------------------------------------------
+    // Convert A CSR
+    //--------------------------------------------------------------------------
+    int *Ams = NULL;
+    Ams = malloc((A->m + 1)*sizeof(*Ams));
+    Ams[0] = 0;
+
+    int *Bns = NULL;
+    Bns = malloc((B->n + 1)*sizeof(*Bns));
+    Bns[0] = 0;
+
+    if (Ams == NULL || Bns == NULL) {
+      fprintf(stderr, "Out of memory");
+      exit(1);
+    }
+
+
+    int AMIndex = 0;
+    int rowsize = 0;
+
+    // record current row within A
+    int currentRow = A->coords[0].i;
+    if (currentRow > 0) {
+      int pad;
+      for (pad = 0; pad < currentRow; pad ++) {
+        Ams[AMIndex + 1] = 0;
+        AMIndex ++;
+      }
+    }
+    // index in A of start of row
+    int currentRowIndexA = 0;
+    // index in A of end of row
+    int endOfRowIndexA = 0;
+
+    // iterate through all rows within A
+    int Aindex;
+    for (Aindex = 0; Aindex < A->NZ; Aindex ++) {
+      if ((A -> coords[Aindex].i != currentRow) || (Aindex == A -> NZ - 1)) {
+        // pad zeroes for completely empty rows
+        int diff = A -> coords[Aindex].i - currentRow;
+        if (diff > 1) {
+          int pad;
+          for (pad = 0; pad < diff - 1; pad ++) {
+            Ams[AMIndex + 1] = 0;
+            AMIndex ++;
+          }
+        }
+        // found end of row
+        if (Aindex == A -> NZ - 1) {
+          endOfRowIndexA = Aindex;
+          rowsize ++;
+        }
+
+        // move to next row
+        currentRow = A->coords[Aindex].i;
+
+        Ams[AMIndex + 1] = Ams[AMIndex] + rowsize;
+        AMIndex ++;
+
+        currentRowIndexA = Aindex;
+        endOfRowIndexA = currentRowIndexA;
+
+        rowsize = 1;
+
+      } else if (A -> coords[Aindex].i == currentRow) {
+        // increment index towards end of row
+        endOfRowIndexA = Aindex;
+        rowsize ++;
+      }
+    }
+
+
+    //--------------------------------------------------------------------------
+    // Convert B CSC
+    //--------------------------------------------------------------------------
+    int BNIndex = 0;
+    int colsize = 0;
+
+    // record current column
+    int currentColumn = B -> coords[0].j;
+    if (currentColumn > 0) {
+      int pad;
+      for (pad = 0; pad < currentColumn; pad ++) {
+        Bns[BNIndex + 1] = 0;
+        BNIndex ++;
+      }
+    }
+    // index in B of start of column
+    int currentColumnIndexB = 0;
+    // index in B of end of column
+    int endOfColumnIndexB = 0;
+
+    int Bindex;
+    for (Bindex = 0; Bindex < B -> NZ; Bindex ++) {
+      if (B -> coords[Bindex].j != currentColumn || Bindex == B -> NZ - 1) {
+        // pad zeroes for completely empty rows
+        int diff = B -> coords[Bindex].j - currentColumn;
+        if (diff > 1) {
+          int pad;
+          for (pad = 0; pad < diff - 1; pad ++) {
+            Bns[BNIndex + 1] = 0;
+            BNIndex ++;
+          }
+        }
+        // found end of column
+        if (Bindex == B -> NZ - 1) {
+          endOfColumnIndexB = Bindex;
+          colsize ++;
+        }
+
+        // move to next column
+        currentColumn = B -> coords[Bindex].j;
+
+        Bns[BNIndex + 1] = Bns[BNIndex] + colsize;
+        BNIndex ++;
+
+        currentColumnIndexB = Bindex;
+        endOfColumnIndexB = currentColumnIndexB;
+
+        colsize = 1;
+      } else if (B -> coords[Bindex].j == currentColumn) {
+        // increment index towards end of column
+        endOfColumnIndexB = Bindex;
+        colsize ++;
+      }
+    }
+    // printf("total B NNZ:%i out of %i", sum2, B->NZ);
 
 
 
-    // convert A to CSR form
-    // NZs
-    // double *ANZ = NULL;
-    // ANZ = malloc(A -> NZ *sizeof(*ANZ));
+
+    //--------------------------------------------------------------------------
+    // MULTIPLY CSR CSC v1
+    //--------------------------------------------------------------------------
+    // int AM_counter = 0;
+    // // iterate over rows;
+    // int Arow;
+    // int Acol;
+    // double Aval;
     //
-    // // AIs
-    // double *AIs = NULL;
-    // AIs = malloc((A -> m + 1)*sizeof(*AIs));
+    // int BN_counter = 0;
+    // // iterate over rows;
+    // int Brow;
+    // int Bcol;
+    // double Bval;
     //
-    // // AJs
-    // double *AJs = NULL;
-    // AJs = malloc(A -> NZ *sizeof(*AJs));
+    // // All Columns
+    // for (BN_counter = 0; BN_counter < B ->n; BN_counter ++) {
+    //     Bcol = BN_counter;
+    //     int Bstart = Bns[BN_counter];
+    //     int Bend = Bns[BN_counter + 1]-1;
     //
-    // if(ANZ == NULL || AIs == NULL || AJs == NULL){
-    //     fprintf(stderr, "Out of memory...\n");
-    //     exit(1);
+    //     // All in each col
+    //     int colIndex;
+    //     for (colIndex = Bstart; colIndex <= Bend; colIndex++ ) {
+    //         Brow = B -> coords[colIndex].i;
+    //         Bval = B -> data[colIndex];
+    //
+    //         // All Rows
+    //         for (AM_counter = 0; AM_counter < A ->m; AM_counter ++) {
+    //             Arow = AM_counter;
+    //             int Astart = Ams[AM_counter];
+    //             int Aend = Ams[AM_counter + 1]-1;
+    //
+    //             // All in each row
+    //             int rowIndex;
+    //             double result = 0.0;
+    //             for (rowIndex = Astart; rowIndex <= Aend; rowIndex++ ) {
+    //                 Acol = A -> coords[rowIndex].j;
+    //                 Aval = A -> data[rowIndex];
+    //
+    //                 if (Acol == Brow) {
+    //                     result += Aval * Bval;
+    //                 }
+    //             }
+    //
+    //             if (result != 0.0) {
+    //                 (*C) -> coords[outputNNZ].i = Arow;
+    //                 (*C) -> coords[outputNNZ].j = Bcol;
+    //                 (*C) -> data[outputNNZ] = result;
+    //                 outputNNZ ++;
+    //                 printf("NNZ %i/%ivalue of %f at coordinates (%d, %d)\n", outputNNZ, outputNonZeroes, result, Arow, Bcol);
+    //             }
+    //         }
+    //     }
     // }
 
 
-    // convert B to CSC form
-    // NZs
-    // double *BNZ = NULL;
-    // BNZ = malloc(B -> NZ *sizeof(*BNZ));
+
+
+
+    //--------------------------------------------------------------------------
+    // May be better for PARALLEL MULTIPLY
+    //--------------------------------------------------------------------------
+    int outputI;
+    int outputJ;
+    int dimX = A->m;
+    int dimY = B->n;
+
+    // row size is the number of items in each row of A
+    // this is also equal to the number of columns in B
+    int rowSize = A->n;
+
+    //#pragma acc kernels
+    for (outputI = 0; outputI < dimX; outputI ++) {
+      double *rowVals = NULL;
+      rowVals = calloc(rowSize, sizeof(*rowVals));
+      if (rowVals == NULL) {
+        fprintf(stderr, "Out of memory");
+        exit(1);
+      }
+
+      int Astart = Ams[outputI];
+      int Aend = Ams[outputI + 1]-1;
+      // build dense row
+      int rowIndex;
+
+      //#pragma acc parallel loop
+      for (rowIndex = Astart; rowIndex <= Aend; rowIndex++ ) {
+          rowVals[A -> coords[rowIndex].j] = A -> data[rowIndex];
+      }
+
+      //#pragma acc parallel loop
+      for (outputJ = 0; outputJ < dimY; outputJ ++) {
+        double *colVals = NULL;
+        colVals = calloc(rowSize, sizeof(*colVals));
+        if (colVals == NULL) {
+          fprintf(stderr, "Out of memory");
+          exit(1);
+        }
+
+        int Bstart = Bns[outputJ];
+        int Bend = Bns[outputJ + 1]-1;
+        // build dense col
+        // All in each col
+        int colIndex;
+
+        //#pragma acc parallel loop
+        for (colIndex = Bstart; colIndex <= Bend; colIndex++ ) {
+          colVals[B -> coords[colIndex].i] = B -> data[colIndex];
+        }
+
+        int rowcol;
+        double result = 0.0;
+
+        #pragma acc parallel loop reduction(+:result)
+        for (rowcol = 0; rowcol < rowsize; rowcol ++) {
+          result += rowVals[rowcol] * colVals[rowcol];
+        }
+
+        if (result != 0.0) {
+          // printf("NNZ %i/%i value of %f at coordinates (%d, %d)\n", outputNNZ, outputNonZeroes, result, outputI, outputJ);
+          (*C) -> coords[outputNNZ].i = outputI;
+          (*C) -> coords[outputNNZ].j = outputJ;
+          (*C) -> data[outputNNZ] = result;
+          outputNNZ ++;
+        }
+        free(colVals);
+      }
+      free(rowVals);
+    }
+
+    free(Ams);
+    free(Bns);
+
+
+
+
+
+
+
+
+
+
+
+
+    //--------------------------------------------------------------------------
+    // Original MULTIPLY
+    //--------------------------------------------------------------------------
+    // int outputNNZ = 0;
+    // int outputNonZeroes = getNonZeroes(A, B, *C);
+    // alloc_sparse(A -> m, B -> n, outputNonZeroes, C);
     //
-    // // BIs
-    // double *BIs = NULL;
-    // BIs = malloc((B -> m + 1)*sizeof(*BIs));
+    // // printf("%i, %i", A->m, B->n);
+    // printf("A NNZ: %i, m:%i, n:%i\n", A->NZ, A->m, A->n);
     //
-    // // AJs
-    // double *BJs = NULL;
-    // AJs = malloc(A -> NZ *sizeof(*AJs));
+    // // record current row within A
+    // int currentRow = A->coords[0].i;
     //
-    // if(ANZ == NULL || AIs == NULL || AJs == NULL){
-    //     fprintf(stderr, "Out of memory...\n");
-    //     exit(1);
+    // // index in A of start of row
+    // int currentRowIndexA = 0;
+    //
+    // // index in A of end of row
+    // int endOfRowIndexA = 0;
+    //
+    // // iterate through all values within A
+    // int Aindex;
+    // for (Aindex = 0; Aindex < A->NZ; Aindex ++) {
+    //     // printf("%i\n",A -> coords[Aindex].i );
+    //     if ((A -> coords[Aindex].i != currentRow) || (Aindex == A -> NZ - 1)) {
+    //         // found end of row
+    //         if (Aindex == A -> NZ - 1) {
+    //             endOfRowIndexA = Aindex;
+    //         }
+    //
+    //         // iterate over all columns of matrix B
+    //         // record current column
+    //         int currentColumn = B -> coords[0].j;
+    //
+    //         // index in B of start of column
+    //         int currentColumnIndexB = 0;
+    //
+    //         // index in B of end of column
+    //         int endOfColumnIndexB = 0;
+    //
+    //         int Bindex;
+    //         for (Bindex = 0; Bindex < B -> NZ; Bindex ++) {
+    //             if (B -> coords[Bindex].j != currentColumn || Bindex == B -> NZ - 1) {
+    //                 // found end of column
+    //                 if (Bindex == B -> NZ - 1) {
+    //                     endOfColumnIndexB = Bindex;
+    //                 }
+    //
+    //                 double result = 0.0;
+    //                 // iterate between start of row and end of row for column in B
+    //                 int inRowIndexA;
+    //                 for (inRowIndexA = currentRowIndexA; inRowIndexA <= endOfRowIndexA; inRowIndexA++) {
+    //                     // for each non zero value within the column, multiply with respective row elements and set respective row element within C
+    //
+    //                     double aData = A -> data[inRowIndexA];
+    //                     int aIValue = A->coords[inRowIndexA].i;
+    //                     int aJValue = A->coords[inRowIndexA].j;
+    //
+    //                     double bData;
+    //                     int bIValue;
+    //                     int bJValue;
+    //
+    //                     int inColumnIndexB;
+    //                     for (inColumnIndexB = currentColumnIndexB; inColumnIndexB <= endOfColumnIndexB; inColumnIndexB++) {
+    //                         bData = B -> data[inColumnIndexB];
+    //                         bIValue = B->coords[inColumnIndexB].i;
+    //                         bJValue = B->coords[inColumnIndexB].j;
+    //
+    //                         if (aJValue == bIValue) {
+    //                             result += aData * bData;
+    //                         }
+    //                     }
+    //                 }
+    //
+    //                 if (result != 0.0) {
+    //                     (*C) -> coords[outputNNZ].i = currentRow;
+    //                     (*C) -> coords[outputNNZ].j = currentColumn;
+    //                     (*C) -> data[outputNNZ] = result;
+    //                     outputNNZ ++;
+    //                     // printf("New output NNZ value of %f at coordinates (%d, %d)\n", result, currentRow, currentColumn);
+    //                 }
+    //
+    //                 currentColumn = B -> coords[Bindex].j;
+    //                 currentColumnIndexB = Bindex;
+    //                 endOfColumnIndexB = currentColumnIndexB;
+    //             } else if (B -> coords[Bindex].j == currentColumn) {
+    //                 // increment index towards end of column
+    //                 endOfColumnIndexB = Bindex;
+    //             }
+    //         }
+    //         // move to next row
+    //         currentRow = A->coords[Aindex].i;
+    //         currentRowIndexA = Aindex;
+    //         endOfRowIndexA = currentRowIndexA;
+    //
+    //     } else if (A -> coords[Aindex].i == currentRow) {
+    //         // increment index towards end of row
+    //         endOfRowIndexA = Aindex;
+    //     }
     // }
 
 
-    // printf("%i, %i", A->m, B->n);
 
+
+
+
+
+    //--------------------------------------------------------------------------
+    // Iterate CSR/CSC
+    //--------------------------------------------------------------------------
+    // int AM_counter;
+    // // iterate over rows;
+    // int row;
+    // int col;
+    // double val;
+    // for (AM_counter = 0; AM_counter < A ->m; AM_counter ++) {
+    //     row = AM_counter;
+    //     int start = Ams[AM_counter];
+    //     int end = Ams[AM_counter + 1]-1;
+    //     // printf("row %i has NNZ index %i to %i\n", AM_counter, start, end);
+    //
+    //     // All Rows
+    //     int rowIndex;
+    //     for (rowIndex = start; rowIndex <= end; rowIndex++ ) {
+    //         col = A -> coords[rowIndex].j;
+    //         val = A -> data[rowIndex];
+    //         // printf("(%i, %i) has value %f (A->NZ index = %i)\n", row, col, val, rowIndex);
+    //     }
+    //
+    // }
+    // free(Ams);
+
+
+
+    // printf("\nAllocated: %i, Actual: %i\n", outputNonZeroes, outputNNZ);
+    // printf("multiplied\n");
+    // printf("output matrix has dimensions %i x %i\n", (*C)->m, (*C)->n);
+    // printf("Output Matrix has dimensions %d x %d, and has %d Non-Zero Entries.\n", A -> m, B -> n, outputNNZ);
+}
+
+
+
+int getNonZeroes(const COO A, const COO B, COO *C) {
+    int outputNNZ = 0;
     // record current row within A
     int currentRow = A->coords[0].i;
 
@@ -125,38 +507,27 @@ void optimised_sparsemm(const COO A, const COO B, COO *C)
                         endOfColumnIndexB = Bindex;
                     }
 
-                    double result = 0.0;
+                    int addedVal = 0;
                     // iterate between start of row and end of row for column in B
                     int inRowIndexA;
                     for (inRowIndexA = currentRowIndexA; inRowIndexA <= endOfRowIndexA; inRowIndexA++) {
                         // for each non zero value within the column, multiply with respective row elements and set respective row element within C
 
-                        double aData = A -> data[inRowIndexA];
-                        int aIValue = A->coords[inRowIndexA].i;
                         int aJValue = A->coords[inRowIndexA].j;
-
-                        double bData;
                         int bIValue;
-                        int bJValue;
 
                         int inColumnIndexB;
                         for (inColumnIndexB = currentColumnIndexB; inColumnIndexB <= endOfColumnIndexB; inColumnIndexB++) {
-                            bData = B -> data[inColumnIndexB];
                             bIValue = B->coords[inColumnIndexB].i;
-                            bJValue = B->coords[inColumnIndexB].j;
 
                             if (aJValue == bIValue) {
-                                result += aData * bData;
+                                addedVal = 1;
                             }
                         }
                     }
 
-                    if (result != 0.0) {
-                        (*C) -> coords[outputNNZ].i = currentRow;
-                        (*C) -> coords[outputNNZ].j = currentColumn;
-                        (*C) -> data[outputNNZ] = result;
+                    if (addedVal == 1) {
                         outputNNZ ++;
-                        // printf("New output NNZ value of %f at coordinates (%d, %d)\n", result, currentRow, currentColumn);
                     }
 
                     currentColumn = B -> coords[Bindex].j;
@@ -178,18 +549,10 @@ void optimised_sparsemm(const COO A, const COO B, COO *C)
         }
     }
 
-    // allocate correct NNZ value
-    // printf("\n%i\n", outputNNZ);
-    (*C)-> NZ = outputNNZ;
-    printf("multiplied\n");
-    printf("output matrix has dimensions %i x %i\n", (*C)->m, (*C)->n);
-    // printf("Output Matrix has dimensions %d x %d, and has %d Non-Zero Entries.\n", A -> m, B -> n, outputNNZ);
-
-
-    // free(ANZ);
-    // free(AIs);
-    // free(AJs);
+    return outputNNZ;
 }
+
+
 
 
 
@@ -261,13 +624,12 @@ void addThreeMatrices(COO m1, COO m2, COO m3, COO out)
 // sum all elements in 3 array
 double sum_array(double* arr) {
     double result = 0.0;
-    result = result + arr[0] + arr[1] + arr[2];
+    result = arr[0] + arr[1] + arr[2];
     return result;
 }
 
 
 void add_three_matrices2(COO m1, COO m2, COO m3, COO* out) {
-    printf("Adding\n");
     int m1index = 0;
     int m2index = 0;
     int m3index = 0;
@@ -284,15 +646,12 @@ void add_three_matrices2(COO m1, COO m2, COO m3, COO* out) {
     int minJ;
 
     // Passover to find indices of rows and columns to add
-
     // object that has 3 arrays are of size outNZ
     // array of output i's
     // array of output j's
     // array vals which contains 3array of vals
-
     // 3 array of vals contains the m1, m2, m3 nz or zeroes
     // sum of this 3array becomes out -> data[nz]
-
     // initially give these arrays size of biggest NZ of input matrix
     int maxNZ = 0;
     maxNZ += m1 -> NZ;
@@ -312,7 +671,7 @@ void add_three_matrices2(COO m1, COO m2, COO m3, COO* out) {
     }
     int i;
     for(i = 0; i < maxNZ; i++){
-        double* p = malloc(3 * sizeof(double));
+        double* p = calloc(3, sizeof(double));
         if(p == NULL){
             fprintf(stderr, "Out of memory");
             exit(1);
@@ -321,7 +680,7 @@ void add_three_matrices2(COO m1, COO m2, COO m3, COO* out) {
     }
 
     // addition
-    printf("m1 NZ: %d, m2 NZ: %i, m3 NZ: %i\n", m1 -> NZ, m2 -> NZ, m3 -> NZ);
+    // printf("m1 NZ: %d, m2 NZ: %i, m3 NZ: %i\n", m1 -> NZ, m2 -> NZ, m3 -> NZ);
     while (m1index < m1 -> NZ || m2index < m2 -> NZ || m3index < m3 -> NZ) {
         minI = m1 -> m;
         minJ = m1 -> n;
@@ -332,45 +691,27 @@ void add_three_matrices2(COO m1, COO m2, COO m3, COO* out) {
         m3I = minI;
         m3J = minJ;
 
-        additions[outNZ][0] = 0.0;
-        additions[outNZ][1] = 0.0;
-        additions[outNZ][2] = 0.0;
-
-        // printf("\n");
-
-        // if in range of NZ
         if (m1index < m1 -> NZ){
           m1I = m1 -> coords[m1index].i;
           m1J = m1 -> coords[m1index].j;
-          // printf("M1 %i/%i - (%i, %i)\n", m1index, m1 -> NZ-1, m1I, m1J);
-          // printf("current minI: %i, m1i:%i\n", minI, m1 -> coords[m1index].i);
-          // if smaller than current seen
           if (m1I <= minI) {
-            // set min to this i value
             minI = m1I;
-            // printf("smaller, so new min I is %i\n", minI);
           }
         }
 
         if (m2index < m2 -> NZ) {
           m2I = m2 -> coords[m2index].i;
           m2J = m2 -> coords[m2index].j;
-          // printf("M2 %i/%i - (%i, %i)\n", m2index, m2 -> NZ-1, m2I, m2J);
-          // printf("current minI: %i, m2i:%i\n", minI, m2 -> coords[m2index].i);
           if (m2I <= minI) {
             minI = m2I;
-            // printf("smaller, so new min I is %i\n", minI);
           }
         }
 
         if (m3index < m3 -> NZ) {
           m3I = m3 -> coords[m3index].i;
           m3J = m3 -> coords[m3index].j;
-          // printf("M3 %i/%i - (%i, %i)\n", m3index, m3 -> NZ-1, m3I, m3J);
-          // printf("current minI: %i, m3i:%i\n", minI, m3 -> coords[m3index].i);
           if (m3I <= minI) {
             minI = m3I;
-            // printf("smaller, so new min I is %i\n", minI);
           }
         }
 
@@ -381,10 +722,8 @@ void add_three_matrices2(COO m1, COO m2, COO m3, COO* out) {
         outIs[outNZ] = minI;
         outJs[outNZ] = minJ;
 
-        // printf("Minimum: %i, %i\n", minI, minJ);
         if (m1index < m1 -> NZ) {
           if (m1I == minI && m1J == minJ) {
-            // printf("Adding M1\n");
             additions[outNZ][0] = m1->data[m1index];
             m1index ++;
           }
@@ -392,7 +731,6 @@ void add_three_matrices2(COO m1, COO m2, COO m3, COO* out) {
 
         if (m2index < m2 -> NZ) {
           if (m2I == minI && m2J == minJ) {
-            // printf("Adding M2\n");
             additions[outNZ][1] = m2->data[m2index];
             m2index ++;
           }
@@ -400,18 +738,13 @@ void add_three_matrices2(COO m1, COO m2, COO m3, COO* out) {
 
         if (m3index < m3 -> NZ) {
           if (m3I == minI && m3J == minJ) {
-            // printf("Adding M3\n");
             additions[outNZ][2] = m3->data[m3index];
             m3index ++;
           }
         }
 
-        // printf("(%i, %i), gets sum of %f + %f + %f\n", minI, minJ, additions[outNZ][0], additions[outNZ][1], additions[outNZ][2]);
         outNZ ++;
     }
-    printf("\nAllocating sparse\n");
-
-    printf("output matrix has dimensions %i x %i\n", m1->m, m1->n);
 
     alloc_sparse(m1 -> m, m1 -> n, outNZ, out);
 
@@ -424,7 +757,6 @@ void add_three_matrices2(COO m1, COO m2, COO m3, COO* out) {
         (*out) -> data[index] = sum_array(additions[index]);
     }
 
-
     int addition_index;
     for(addition_index = 0; addition_index < maxNZ; addition_index++) {
         free(additions[addition_index]);
@@ -432,7 +764,6 @@ void add_three_matrices2(COO m1, COO m2, COO m3, COO* out) {
     free(additions);
     free(outIs);
     free(outJs);
-    printf("Added\n");
 }
 
 
@@ -453,7 +784,7 @@ void optimised_sparsemm_sum(const COO A, const COO B, const COO C,
     COO G;
     COO H;
 
-    printf("m1 NZ: %d, m2 NZ: %i, m3 NZ: %i\n", A -> NZ, B -> NZ, C -> NZ);
+    // printf("m1 NZ: %d, m2 NZ: %i, m3 NZ: %i\n", A -> NZ, B -> NZ, C -> NZ);
 
     // addThreeMatrices(A, B, C, G);
     // addThreeMatrices(D, E, F, H);
