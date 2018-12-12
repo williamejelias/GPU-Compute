@@ -247,7 +247,7 @@ void write_sparse(FILE *f, COO sp)
     int i;
     fprintf(f, "%d %d %d\n", sp->m, sp->n, sp->NZ);
     for (i = 0; i < sp->NZ; i++) {
-        fprintf(f, "%d %d %g\n", sp->coords[i].i, sp->coords[i].j, sp->data[i]);
+        fprintf(f, "%d %d %.15g\n", sp->coords[i].i, sp->coords[i].j, sp->data[i]);
     }
 }
 
@@ -267,7 +267,10 @@ void read_sparse_binary(const char *file, COO *sparse)
     int m, n, NZ;
     size_t nread;
     FILE *f = fopen(file, "r");
-
+    if (!f) {
+        fprintf(stderr, "Unable to open %s for reading.\n", file);
+        exit(1);
+    }
     nread = fread(&m, sizeof(m), 1, f);
     if (nread != 1) {
       fprintf(stderr, "Did not read rows from file\n");

@@ -36,12 +36,12 @@ A, B, C, D, E, F = map(read_matrix, args.matrices)
 
 actual = read_matrix(args.actual)
 
-expect = (A + B + C) @ (D + E + F)
+expect = numpy.dot((A + B + C), (D + E + F))
 
 diff = expect - actual
 rnorm = scipy.sparse.linalg.norm(diff) / scipy.sparse.linalg.norm(expect)
 
 if rnorm < 1e-6:
-    print("ok")
+    print("ok: ||E - A|| / ||E|| = {}".format(rnorm))
 else:
-    print("fail")
+    print("fail: ||E - A|| / ||E|| = {}".format(rnorm))
