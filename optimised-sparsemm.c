@@ -79,8 +79,8 @@ void optimised_sparsemm(const COO A, const COO B, COO *C)
   int Bn = B->n;
   int BNZ = B->NZ;
 
-  // printf("A NNZ: %i, m:%i, n:%i\n", A->NZ, A->m, A->n);
-  // printf("B NNZ: %i, m:%i, n:%i\n", BNZ, Bm, Bn);
+  printf("A NNZ: %i, m:%i, n:%i\n", A->NZ, A->m, A->n);
+  printf("B NNZ: %i, m:%i, n:%i\n", BNZ, Bm, Bn);
 
   // create array of structs for B
   struct _dataEntry *B_entries = NULL;
@@ -90,7 +90,7 @@ void optimised_sparsemm(const COO A, const COO B, COO *C)
     exit(1);
   }
 
-  // printf("Allocated B...\n");
+  printf("Allocated B...\n");
 
   int b_entry_index;
   #pragma vector aligned
@@ -100,10 +100,8 @@ void optimised_sparsemm(const COO A, const COO B, COO *C)
     B_entries[b_entry_index].j = B->coords[b_entry_index].j;
     B_entries[b_entry_index].data = B->data[b_entry_index];
   }
-  // printf("Sorting B...\n");
+  printf("Sorting B...\n");
   qsort(B_entries, BNZ, sizeof(struct _dataEntry), cmpfunc);
-
-  int outputNNZ = 0;
 
   //--------------------------------------------------------------------------
   // Convert A CSR
@@ -287,9 +285,13 @@ void optimised_sparsemm(const COO A, const COO B, COO *C)
   // this is also equal to the number of columns in B
   int rowSize = A->n;
 
-  #pragma acc parallel loop
+  // incremented to set each successive value within output matrix
+  int outputNNZ = 0;
+
+  // #pragma acc parallel loop
+  #pragma acc kernels
   for (outputI = 0; outputI < dimX; outputI ++) {
-    #pragma acc loop
+    // #pragma acc loop
     for (outputJ = 0; outputJ < dimY; outputJ ++) {
 
       int Astart = Ams[outputI];
