@@ -79,8 +79,8 @@ void optimised_sparsemm(const COO A, const COO B, COO *C)
   int Bn = B->n;
   int BNZ = B->NZ;
 
-  printf("A NNZ: %i, m:%i, n:%i\n", A->NZ, A->m, A->n);
-  printf("B NNZ: %i, m:%i, n:%i\n", BNZ, Bm, Bn);
+  // printf("A NNZ: %i, m:%i, n:%i\n", A->NZ, A->m, A->n);
+  // printf("B NNZ: %i, m:%i, n:%i\n", BNZ, Bm, Bn);
 
   // create array of structs for B
   struct _dataEntry *B_entries = NULL;
@@ -90,7 +90,7 @@ void optimised_sparsemm(const COO A, const COO B, COO *C)
     exit(1);
   }
 
-  printf("Allocated B...\n");
+  // printf("Allocated B...\n");
 
   int b_entry_index;
   #pragma vector aligned
@@ -100,7 +100,7 @@ void optimised_sparsemm(const COO A, const COO B, COO *C)
     B_entries[b_entry_index].j = B->coords[b_entry_index].j;
     B_entries[b_entry_index].data = B->data[b_entry_index];
   }
-  printf("Sorting B...\n");
+  // printf("Sorting B...\n");
   qsort(B_entries, BNZ, sizeof(struct _dataEntry), cmpfunc);
 
   int outputNNZ = 0;
@@ -108,8 +108,7 @@ void optimised_sparsemm(const COO A, const COO B, COO *C)
   //--------------------------------------------------------------------------
   // Convert A CSR
   //--------------------------------------------------------------------------
-  printf("A to CSR format...\n");
-
+  // printf("A to CSR format...\n");
 
   int *Ams = NULL;
   Ams = calloc((A->m + 1), sizeof(Ams));
@@ -200,7 +199,7 @@ void optimised_sparsemm(const COO A, const COO B, COO *C)
   //--------------------------------------------------------------------------
   // Convert B CSC
   //--------------------------------------------------------------------------
-  printf("B to CSC format...\n");
+  // printf("B to CSC format...\n");
   int BNIndex = 0;
   int colsize = 0;
 
@@ -270,18 +269,15 @@ void optimised_sparsemm(const COO A, const COO B, COO *C)
   // printf("\n");
   // checkB(B, Bns);
 
-  printf("Allocating sparse...\n");
+  // printf("Allocating sparse...\n");
   // int outputNonZeroes = getNonZeroes(A, B, *C, Ams, Bns);
   int outputNonZeroes = getNonZeroes(A, Bn, B_entries, Ams, Bns);
   alloc_sparse(A -> m, Bn, outputNonZeroes, C);
 
-
-
-
   //--------------------------------------------------------------------------
   // MULTIPLY CSR CSC v1
   // --------------------------------------------------------------------------
-  printf("multiplying...\n");
+  // printf("multiplying...\n");
   int outputI;
   int outputJ;
   int dimX = A->m;
@@ -332,9 +328,6 @@ void optimised_sparsemm(const COO A, const COO B, COO *C)
       // printf("output cell %i %i has value %f\n", outputI, outputJ, result);
     }
   }
-
-
-
 
   //--------------------------------------------------------------------------
   // May be better for PARALLEL MULTIPLY
@@ -410,14 +403,12 @@ void optimised_sparsemm(const COO A, const COO B, COO *C)
   //
 
 
-
-
   free(Ams);
   free(Bns);
   free(B_entries);
-  printf("Multiplied.\n");
-  printf("output matrix has dimensions %i x %i\n", (*C)->m, (*C)->n);
-  printf("Output Matrix has dimensions %d x %d, and has %d Non-Zero Entries.\n\n", A -> m, B -> n, outputNNZ);
+  // printf("Multiplied.\n");
+  // printf("output matrix has dimensions %i x %i\n", (*C)->m, (*C)->n);
+  // printf("Output Matrix has dimensions %d x %d, and has %d Non-Zero Entries.\n\n", A -> m, B -> n, outputNNZ);
 }
 
 
@@ -661,6 +652,7 @@ void addThreeMatrices2(COO m1, COO m2, COO m3, COO* out) {
   // CHECK THIS PRAGMA FOR EFFICIENCY
   // #pragma vector always
   #pragma acc parallel loop
+  #pragma vector aligned
   for (index = 0; index < outNZ; index ++) {
     (*out) -> coords[index].i = outIs[index];
     (*out) -> coords[index].j = outJs[index];
