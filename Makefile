@@ -6,8 +6,8 @@
 CFLAGS = -g -O3 -qopt-report=5 -qopt-report-phase=vec -march=native  -D_GNU_SOURCE
 CC = icc
 
-# CFLAGS = -g -O3 -march=native -D_GNU_SOURCE
-# CC = gcc
+# CFLAGS = -g -O3 -fopenacc -march=native -D_GNU_SOURCE
+# CC = gcc-8.2
 
 # parallelised
 # CFLAGS = -g -O3 -fast -acc -Minline -Minfo -ta=multicore -D_GNU_SOURCE

@@ -93,8 +93,8 @@ void optimised_sparsemm(const COO A, const COO B, COO *C)
   printf("Allocated B...\n");
 
   int b_entry_index;
-  // #pragma vector aligned
-  // #pragma acc kernels
+  #pragma vector aligned
+  #pragma acc parallel loop
   for (b_entry_index = 0; b_entry_index < BNZ; b_entry_index++) {
     B_entries[b_entry_index].i = B->coords[b_entry_index].i;
     B_entries[b_entry_index].j = B->coords[b_entry_index].j;
@@ -109,12 +109,14 @@ void optimised_sparsemm(const COO A, const COO B, COO *C)
   // Convert A CSR
   //--------------------------------------------------------------------------
   printf("A to CSR format...\n");
+
+
   int *Ams = NULL;
-  Ams = malloc((A->m + 1)*sizeof(*Ams));
+  Ams = calloc((A->m + 1), sizeof(Ams));
   Ams[0] = 0;
 
   int *Bns = NULL;
-  Bns = malloc((B->n + 1)*sizeof(*Bns));
+  Bns = calloc((B->n + 1), sizeof(Bns));
   Bns[0] = 0;
 
   if (Ams == NULL || Bns == NULL) {
@@ -289,9 +291,9 @@ void optimised_sparsemm(const COO A, const COO B, COO *C)
   // this is also equal to the number of columns in B
   int rowSize = A->n;
 
-  // #pragma acc parallel loop
+  #pragma acc parallel loop
   for (outputI = 0; outputI < dimX; outputI ++) {
-    // #pragma acc parallel loop
+    #pragma acc loop
     for (outputJ = 0; outputJ < dimY; outputJ ++) {
 
       int Astart = Ams[outputI];
@@ -432,9 +434,9 @@ int getNonZeroes(const COO A, int Bn, struct _dataEntry* arr, const int* Ams, co
   // this is also equal to the number of columns in B
   int rowSize = A->n;
 
-  // #pragma acc parallel loop
+  #pragma acc parallel loop
   for (outputI = 0; outputI < dimX; outputI ++) {
-    // #pragma acc loop
+    #pragma acc loop
     for (outputJ = 0; outputJ < dimY; outputJ ++) {
       int Astart = Ams[outputI];
       int Aend = Ams[outputI + 1]-1;
@@ -658,7 +660,7 @@ void addThreeMatrices2(COO m1, COO m2, COO m3, COO* out) {
   int index;
   // CHECK THIS PRAGMA FOR EFFICIENCY
   // #pragma vector always
-  // #pragma acc parallel loop
+  #pragma acc parallel loop
   for (index = 0; index < outNZ; index ++) {
     (*out) -> coords[index].i = outIs[index];
     (*out) -> coords[index].j = outJs[index];
@@ -666,7 +668,7 @@ void addThreeMatrices2(COO m1, COO m2, COO m3, COO* out) {
   }
 
   int addition_index;
-  // #pragma acc parallel loop
+  #pragma acc parallel loop
   for(addition_index = 0; addition_index < maxNZ; addition_index++) {
     free(additions[addition_index]);
   }
