@@ -79,8 +79,8 @@ void optimised_sparsemm(const COO A, const COO B, COO *C)
   int Bn = B->n;
   int BNZ = B->NZ;
 
-  printf("A NNZ: %i, m:%i, n:%i\n", A->NZ, A->m, A->n);
-  printf("B NNZ: %i, m:%i, n:%i\n", BNZ, Bm, Bn);
+  // printf("A NNZ: %i, m:%i, n:%i\n", A->NZ, A->m, A->n);
+  // printf("B NNZ: %i, m:%i, n:%i\n", BNZ, Bm, Bn);
 
   // create array of structs for B
   struct _dataEntry *B_entries = NULL;
@@ -90,7 +90,7 @@ void optimised_sparsemm(const COO A, const COO B, COO *C)
     exit(1);
   }
 
-  printf("Allocated B...\n");
+  // printf("Allocated B...\n");
 
   int b_entry_index;
   #pragma vector aligned
@@ -100,14 +100,13 @@ void optimised_sparsemm(const COO A, const COO B, COO *C)
     B_entries[b_entry_index].j = B->coords[b_entry_index].j;
     B_entries[b_entry_index].data = B->data[b_entry_index];
   }
-  printf("Sorting B...\n");
+  // printf("Sorting B...\n");
   qsort(B_entries, BNZ, sizeof(struct _dataEntry), cmpfunc);
 
   //--------------------------------------------------------------------------
   // Convert A CSR
   //--------------------------------------------------------------------------
   // printf("A to CSR format...\n");
-
   int *Ams = NULL;
   Ams = calloc((A->m + 1), sizeof(Ams));
   Ams[0] = 0;
