@@ -1,7 +1,16 @@
+# optimised
+# CFLAGS = -g -O3 -no-vec -march=native  -D_GNU_SOURCE
+# CC = icc
+
+# vectorised
 CFLAGS = -g -O3 -qopt-report=5 -qopt-report-phase=vec -march=native  -D_GNU_SOURCE
 CC = icc
 
-# CFLAGS = -g -O3 -fast -Mvect=simd -Mcache_align -Mvect -Mflushz -D_GNU_SOURCE
+# CFLAGS = -g -O3 -march=native -D_GNU_SOURCE
+# CC = gcc
+
+# parallelised
+# CFLAGS = -g -O3 -fast -acc -Minline -Minfo -ta=multicore -D_GNU_SOURCE
 # CC = pgcc
 
 LDFLAGS = -lm
