@@ -11,9 +11,22 @@ This repository contains code written in C for optimised sparse matrix-matrix ad
 
 Sample matrices are provided in the zip files.
 
+The makefile contains lines that can be commented/uncommented in order to compile with a different compiler/flags. The Intel Compiler (ICC) provides the fastest binaries for scalar compilation, but to generate a parallelised compilation, the PGI compiler must be used.
+
 ```bash
 cd GPU_Compute
-...
+make
 ```
 
-More stuff here
+The implemented functionality for sparse matrices are as follows:
+* matrix-matrix multiplication
+    * A * B
+* matrix-matrix addition followed by multiplication:
+    * (A + B + C) * (D + E + F)
+    
+ To perform either operation use:
+ ``` 
+ ./sparsemm M1 M2 output.matrix
+ ./sparsemm M1 M2 M3 M4 M5 M6 output.matrix
+ ```
+ where `M1-M6` are input matrices from the sample zip files, and `output.matrix` specifies the name of the output file.
